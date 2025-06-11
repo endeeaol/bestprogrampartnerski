@@ -127,7 +127,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $query->innerJoin('cart_rule', 'cr', 'ocr.id_cart_rule = cr.id_cart_rule');
             $query->innerJoin('pshow_rp_partner', 'prt', 'cr.id_cart_rule = prt.id_voucher');
 
-            $query->where('o.date_add >= \'' . pSQL($date_from) . '\' AND o.date_add <= \'' . pSQL($date_to) . '\''); // Poprawka $date_to
+            $query->where('o.date_add >= \'' . pSQL($date_from) . '\' AND o.date_add <= \'' . pSQL($date_to) . '\'');
             $query->where('o.current_state = 4 AND o.valid = 1');
             $query->where('od.product_id NOT IN (' . implode(',', $this->excludedProductIdsFromSum) . ')');
             $query->where('prt.id_partner = ' . (int)$id_partner);
@@ -171,24 +171,24 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         // --- BUDOWANIE HTML W PHP DLA MODALA BL ---
         $html_output = '';
         if (empty($order_details_bl)) {
-            $html_output = '<p>Brak szczegółowych danych dla tego okresu i kodu.</p>'; // Tekst bez Smarty
+            $html_output = '<p>Brak szczegółowych danych dla tego okresu i kodu.</p>';
         } else {
             // Liczba koszyków
             $html_output .= '<p><strong>Koszyków: ' . count($order_details_bl) . '</strong></p>';
 
-            $html_output .= '<table class="table table-bordered table-striped modal-report-table">'; // Dodano klasę dla stylizacji
-            $html_output .= '<thead><tr><th>Koszyk ID</th><th>Wartość (całość)</th><th colspan="2">Produkty (Netto / Netto po -15%)</th></tr></thead><tbody>'; // Tekst bez Smarty
+            $html_output .= '<table class="table table-bordered table-striped modal-report-table">';
+            $html_output .= '<thead><tr><th>Koszyk ID</th><th>Wartość (całość)</th><th colspan="2">Produkty (Netto / Netto po -15%)</th></tr></thead><tbody>';
             foreach ($order_details_bl as $order) {
                 $html_output .= '<tr>';
                 $html_output .= '<td>' . $order['id_order'] . '</td>';
                 $html_output .= '<td>' . $order['order_total_paid_tax_excl_overall'] . '</td>';
                 $html_output .= '<td colspan="2"><ul class="list-unstyled">';
                 foreach ($order['products'] as $product) {
-                    $html_output .= '<li>' . $product['name'] . ' x ' . $product['quantity'] . ' (Netto: ' . $product['total_price_tax_excl_original'] . ') (Netto po -15%: ' . $product['total_price_tax_excl_discounted'] . ')</li>'; // Tekst bez Smarty
+                    $html_output .= '<li>' . $product['name'] . ' x ' . $product['quantity'] . ' (Netto: ' . $product['total_price_tax_excl_original'] . ') (Netto po -15%: ' . $product['total_price_tax_excl_discounted'] . ')</li>';
                 }
                 $html_output .= '</ul></td>';
                 $html_output .= '</tr>';
-                $html_output .= '<tr><td colspan="4" class="text-right"><strong>Suma koszyka BL: ' . $order['calculated_sum_from_detail_formatted'] . '</strong></td></tr>'; // Tekst bez Smarty
+                $html_output .= '<tr><td colspan="4" class="text-right"><strong>Suma koszyka BL: ' . $order['calculated_sum_from_detail_formatted'] . '</strong></td></tr>';
             }
             $html_output .= '</tbody></table>';
         }
@@ -223,7 +223,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $query->innerJoin('orders', 'o', 'prv.id_order = o.id_order');
             $query->innerJoin('order_cart_rule', 'ocr', 'o.id_order = ocr.id_order');
 
-            $query->where('prv.date_add >= \'' . pSQL($date_from) . '\' AND prv.date_add <= \'' . pSQL($date_to) . '\''); // Poprawka $date_to
+            $query->where('prv.date_add >= \'' . pSQL($date_from) . '\' AND prv.date_add <= \'' . pSQL($date_to) . '\'');
             $query->where('prv.confirmed = 1');
             $query->where('o.current_state = 4 AND o.valid = 1');
             $query->where('prv.id_partner = ' . (int)$id_partner);
@@ -246,13 +246,13 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         // --- BUDOWANIE HTML W PHP DLA MODALA PP ---
         $html_output = '';
         if (empty($provision_details)) {
-            $html_output = '<p>Brak szczegółowych danych dla tego okresu i kodu.</p>'; // Tekst bez Smarty
+            $html_output = '<p>Brak szczegółowych danych dla tego okresu i kodu.</p>';
         } else {
             // Liczba koszyków
             $html_output .= '<p><strong>Koszyków: ' . count($provision_details) . '</strong></p>';
 
-            $html_output .= '<table class="table table-bordered table-striped modal-report-table">'; // Dodano klasę dla stylizacji
-            $html_output .= '<thead><tr><th>Koszyk ID</th><th>Wartość koszyka</th><th>Prowizja (kwota)</th></tr></thead><tbody>'; // Tekst bez Smarty
+            $html_output .= '<table class="table table-bordered table-striped modal-report-table">';
+            $html_output .= '<thead><tr><th>Koszyk ID</th><th>Wartość koszyka</th><th>Prowizja (kwota)</th></tr></thead><tbody>';
             foreach ($provision_details as $item) {
                 $html_output .= '<tr><td>' . $item['id_order'] . '</td><td>' . $item['order_value'] . '</td><td>' . $item['provision_value'] . '</td></tr>';
             }
@@ -409,8 +409,8 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
 
             $key = (int)$row['id_partner'] . '_' . (int)$row['id_cart_rule'];
             $report_data[$key] = $row;
-            $report_data[$key]['total_orders_value_display'] = 0.0; // Inicjalizacja
-            $report_data[$key]['provision_order_value_for_tiers'] = 0.0; // Inicjalizacja
+            $report_data[$key]['total_orders_value_display'] = 0.0; // Inicjalizacja dla "Suma zamówień BL"
+            $report_data[$key]['provision_order_value_for_tiers'] = 0.0; // Inicjalizacja dla "Suma zamówień PP" (wartość bazowa dla progów kontrolnych)
 
             $partner_ids[] = (int)$row['id_partner'];
             $cart_rule_ids[] = (int)$row['id_cart_rule'];
@@ -424,7 +424,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         }
 
 
-        // --- ZAPYTANIE 2: Suma obliczonej wartości zamówień (total_price_tax_excl * 0.85, bez ID 78) ---
+        // --- ZAPYTANIE 2: Suma obliczonej wartości zamówień BL (total_price_tax_excl * 0.85, bez ID 78) ---
         if (!empty($partner_ids) && !empty($cart_rule_ids)) {
             $query_calculated_orders_value = new DbQuery();
             $query_calculated_orders_value->select('
@@ -455,7 +455,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             }
         }
 
-        // --- ZAPYTANIE 3: Suma order_value z ps_pshow_rp_provision (dla Kontrolki P.P.) ---
+        // --- ZAPYTANIE 3: Suma order_value z ps_pshow_rp_provision (dla kolumny "Suma zamówień PP" / wartość bazowa dla kontroli) ---
         if (!empty($partner_ids) && !empty($cart_rule_ids)) {
             $query_provision_control_value = new DbQuery();
             $query_provision_control_value->select('
@@ -507,30 +507,36 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                 $row['partner_display_name'] = $this->l('Brak danych partnera');
             }
 
+            // --- DEKLARACJA ZMIENNYCH DLA OBLICZEŃ ---
+            $total_orders_value_display_float = (float)$row['total_orders_value_display']; // Suma zamówień BL (główna podstawa)
+            $provision_order_value_for_tiers_float = (float)$row['provision_order_value_for_tiers']; // Suma zamówień PP (wartość dla kontroli)
+            $provision_base_value_float = (float)$row['provision']; // Początkowy procent prowizji z konfiguracji
+
+            // --- KOLUMNA "PODSTAWADla "Suma zamówień PP" (wartość kontrolna) ---
+            $row['control_pp_value_formatted'] = Tools::displayPrice($provision_order_value_for_tiers_float, $this->context->currency);
+
             // --- KOLUMNA "PODSTAWA (%)" ---
-            $total_orders_value_display_float = (float)$row['total_orders_value_display'];
-            $provision_order_value_for_tiers_float = (float)$row['provision_order_value_for_tiers'];
-            $provision_base_value_float = (float)$row['provision'];
             $row['provision_base_formatted'] = $provision_base_value_float . '%';
 
-            // --- KOLUMNA "PROWIZJA" ---
+            // --- KOLUMNA "PROWIZJA" (Wyliczona kwota prowizji na podstawie Sumy zamówień BL) ---
             $calculated_provision_amount = 0;
             $calculated_provision_class = '';
 
+            // KWOTA BAZOWA DLA PROGÓW I OBLICZEŃ PROWIZJI: Użyj 'total_orders_value_display_float' (Suma zamówień BL)
             if (round($provision_base_value_float, 2) == 5.00) {
-                $actual_tiered_rate = $this->getTieredCommissionRate($total_orders_value_display_float);
-                $calculated_provision_amount = $total_orders_value_display_float * $actual_tiered_rate;
+                $actual_tiered_rate = $this->getTieredCommissionRate($total_orders_value_display_float); // Baza to BL!
+                $calculated_provision_amount = $total_orders_value_display_float * $actual_tiered_rate; // Baza to BL!
 
-                if ($total_orders_value_display_float > 5000.00) {
+                if ($total_orders_value_display_float > 5000.00) { // Próg porównywany z BL!
                     $calculated_provision_class = 'threshold-highlight';
                 }
             } else {
-                $calculated_provision_amount = $total_orders_value_display_float * ($provision_base_value_float / 100);
+                $calculated_provision_amount = $total_orders_value_display_float * ($provision_base_value_float / 100); // Baza to BL!
             }
             $calculated_provision_formatted = Tools::displayPrice($calculated_provision_amount, $this->context->currency);
 
 
-            // Logika warunkowa dla PIERWSZEJ linii kolumny "Prowizja"
+            // Logika warunkowa dla PIERWSZEJ linii kolumny "Prowizja" (próg)
             $first_line_display = '';
 
             $percentage_value_for_first_line = $provision_base_value_float . '%';
@@ -539,13 +545,14 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             if (round($provision_base_value_float, 2) != 0.00) {
                 $first_line_display .= $this->l('Próg: ') . $percentage_value_for_first_line_html;
 
+                // Sprawdź, czy przekroczono próg dla 5% (w oparciu o kwotę z BL)
                 if (round($provision_base_value_float, 2) == 5.00 && $total_orders_value_display_float > 5000.00) {
                     $first_line_display = preg_replace(
                         '/<strong class="prog-prowizji">([\d.,]+%)<\/strong>/',
                         '<strong class="prog-prowizji"><del>$1</del></strong>',
                         $first_line_display
                     );
-                    $actual_tiered_rate_percentage = $this->getTieredCommissionRate($total_orders_value_display_float) * 100;
+                    $actual_tiered_rate_percentage = $this->getTieredCommissionRate($total_orders_value_display_float) * 100; // Baza to BL!
                     $first_line_display .= ' <strong class="tiered-rate-highlight">' . $actual_tiered_rate_percentage . '%</strong>';
                 }
             } else {
@@ -554,13 +561,8 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
 
             $row['final_provision_display'] = $first_line_display . '<br><span class="' . $calculated_provision_class . '">' . $calculated_provision_formatted . '</span>';
 
-            // --- KONIEC LOGIKI DLA KOLUMNY "PROWIZJA" ---
-
-            // --- KOLUMNA "KONTROLKA P.P." ---
-            $row['control_pp_value_raw'] = $provision_order_value_for_tiers_float;
-            $row['control_pp_value_formatted'] = Tools::displayPrice($row['control_pp_value_raw'], $this->context->currency);
-
-            // --- LOGIKA WERYFIKACJI DLA KONTROLKI P.P. ---
+            // --- KOLUMNA "CONTROL" (wcześniej "KONTROLKA P.P. - WERYFIKACJA") ---
+            // Użyj wartości z BL i PP do weryfikacji.
             $row['control_verification_status'] = '';
             $row['control_verification_class'] = '';
 
@@ -571,7 +573,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             } else {
                 // Standardowa logika weryfikacji (z tolerancją)
                 $tolerance = 0.05;
-                if (abs($total_orders_value_display_float - $provision_order_value_for_tiers_float) < $tolerance) {
+                if (abs($total_orders_value_display_float - $provision_order_value_for_tiers_float) < $tolerance) { // Porównanie BL vs PP!
                     $row['control_verification_status'] = $this->l('OK');
                     $row['control_verification_class'] = 'success';
                 } else {
@@ -583,11 +585,11 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                 }
             }
 
-            // --- KOLUMNA "WARTOŚĆ ZAMÓWIEŃ" ---
+            // --- KOLUMNA "WARTOŚĆ ZAMÓWIEŃ BL" ---
+            // Ta kolumna pozostaje bez zmian
             $row['total_orders_value_formatted'] = Tools::displayPrice($total_orders_value_display_float, $this->context->currency);
 
-            // --- KOLUMNA "PROWIZJA NETTO" ---
-            // Ta zmienna zostanie użyta w szablonie do wyświetlenia ostatniej kolumny
+            // --- KOLUMNA "PROWIZJA NETTO" (TO COŚ W SUMIE JEST IDENTYCZNE Z OBLICZONĄ PROWIZJĄ, ALE ZOSTAWIAM JAK BYŁO) ---
             $row['net_commission_display_formatted'] = '<strong class="net-commission-highlight">' . $calculated_provision_formatted . '</strong>';
         }
 

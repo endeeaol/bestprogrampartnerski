@@ -1,4 +1,4 @@
-{**
+{*
  * 2007-2025 PrestaShop
  *
  * NOTICE OF LICENSE
@@ -24,7 +24,7 @@
 
 <div class="panel">
     <div class="panel-heading">
-        <i class="icon-cogs"></i> {l s='Raportowanie PP' mod='bestprogrampartnerski'}
+        <i class="icon-cogs"></i> Raportowanie PP
     </div>
 
     <div>
@@ -37,30 +37,30 @@
             <li>10% 13.000,01 zł netto 15.000,00 zł netto;</li>
             <li>12% od 15.000,01 zł netto</li>
         </ul>
-        <p>{l s='Wysokość obliczanych progów zmienisz w config/commission_tiers.php' mod='bestprogrampartnerski'}</p>
+        <p>Wysokość obliczanych progów zmienisz w config/commission_tiers.php</p>
     </div>
 
     <div id="filter_container" class="form-horizontal">
         <div class="form-group">
-            <label class="control-label col-lg-1">{l s='Tryb filtrowania' mod='bestprogrampartnerski'}</label>
+            <label class="control-label col-lg-1">Tryb filtrowania</label>
             <div class="col-lg-3">
                 <div class="radio-inline">
                     <label>
                         <input type="radio" name="filter_mode" id="mode_monthly" value="monthly" {if $selected_filter_mode == 'monthly' || !$selected_filter_mode}checked="checked"{/if} onchange="toggleFilterMode()" />
-                        {l s='Miesiącami' mod='bestprogrampartnerski'}
+                        Miesiącami
                     </label>
                 </div>
                 <div class="radio-inline">
                     <label>
                         <input type="radio" name="filter_mode" id="mode_custom" value="custom" {if $selected_filter_mode == 'custom'}checked="checked"{/if} onchange="toggleFilterMode()" />
-                        {l s='Własny zakres' mod='bestprogrampartnerski'}
+                        Własny zakres
                     </label>
                 </div>
             </div>
         </div>
 
         <div class="form-group filter-mode-monthly">
-            <label class="control-label col-lg-1">{l s='Rok' mod='bestprogrampartnerski'}</label>
+            <label class="control-label col-lg-1">Rok</label>
             <div class="col-lg-2">
                 <select id="filter_year_select" name="filter_year" class="form-control" onchange="reloadPageWithFilters()">
                     {foreach from=$years item='year_val'}
@@ -70,8 +70,8 @@
                     {/foreach}
                 </select>
             </div>
-            <label class="control-label col-lg-1">{l s='Miesiąc' mod='bestprogrampartnerski'}</label>
-            <div class="col-lg-2">
+            <label class="control-label col-lg-1">Miesiąc</label>
+            <div class="col-lg-1">
                 <select id="filter_month_select" name="filter_month" class="form-control" onchange="reloadPageWithFilters()">
                     {foreach from=$months key='month_num' item='month_name'}
                         <option value="{$month_num|escape:'htmlall':'UTF-8'}" {if $selected_month == $month_num}selected="selected"{/if}>
@@ -83,15 +83,15 @@
         </div>
 
         <div class="form-group filter-mode-custom" style="display:none;">
-            <label class="control-label col-lg-1">{l s='Od' mod='bestprogrampartnerski'}</label>
+            <label class="control-label col-lg-1">Od</label>
             <div class="col-lg-3">
                 <div class="input-group">
                     <input type="text" id="date_from_input" name="date_from" class="datepicker form-control" value="{$selected_date_from|escape:'htmlall':'UTF-8'}" data-original-title="" title="" autocomplete="off" />
                     <span class="input-group-addon"><i class="icon-calendar"></i></span>
                 </div>
             </div>
-            
-            <label class="control-label col-lg-1">{l s='Do' mod='bestprogrampartnerski'}</label>
+
+            <label class="control-label col-lg-1">Do</label>
             <div class="col-lg-3">
                 <div class="input-group">
                     <input type="text" id="date_to_input" name="date_to" class="datepicker form-control" value="{$selected_date_to|escape:'htmlall':'UTF-8'}" data-original-title="" title="" autocomplete="off" />
@@ -99,28 +99,28 @@
                 </div>
             </div>
         </div>
-    </div> 
+    </div>
 
     <hr/>
 
     {if $report_data|@count > 0}
         <div class="panel">
             <div class="panel-heading">
-                <i class="icon-table"></i> {l s='Raport od %s do %s' sprintf=[$report_dates_info.start_display, $report_dates_info.end_display] mod='bestprogrampartnerski'}
+                <i class="icon-table"></i> Raport od {$report_dates_info.start_display} do {$report_dates_info.end_display}
             </div>
             <div class="table-responsive">
                 <table class="table" id="report_table">
                     <thead>
                         <tr>
-                            <th class="table-header-padding">{l s='Kod rabatowy (id kodu)' mod='bestprogrampartnerski'}</th>
-                            <th class="table-header-padding">{l s='Partner (id klienta) (id partnera)' mod='bestprogrampartnerski'}</th>
-                            <th class="table-header-padding">{l s='E-mail' mod='bestprogrampartnerski'}</th>
-                            <th class="table-header-padding table-cell-right">{l s='Suma zamówień BL' mod='bestprogrampartnerski'}</th>
-                            <th class="table-header-padding table-cell-right">{l s='Suma zamówień PP' mod='bestprogrampartnerski'}</th> 
-                            <th class="table-header-padding table-cell-right">{l s='Podstawa (%)' mod='bestprogrampartnerski'}</th>
-                            <th class="table-header-padding table-cell-left">{l s='Prowizja' mod='bestprogrampartnerski'}</th>
-                            <th class="table-header-padding table-cell-right">{l s='Prowizja netto' mod='bestprogrampartnerski'}</th> 
-                            <th class="table-header-padding">{l s='Control' mod='bestprogrampartnerski'}</th>
+                            <th class="table-header-padding">Kod rabatowy (id kodu)</th>
+                            <th class="table-header-padding">Partner (id klienta) (id partnera)</th>
+                            <th class="table-header-padding">E-mail</th>
+                            <th class="table-header-padding table-cell-right">Suma zamówień BL</th>
+                            <th class="table-header-padding table-cell-right">Suma zamówień PP</th>
+                            <th class="table-header-padding table-cell-right">Podstawa (%)</th>
+                            <th class="table-header-padding table-cell-left">Prowizja</th>
+                            <th class="table-header-padding table-cell-right">Prowizja netto</th>
+                            <th class="table-header-padding">Control</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -129,23 +129,23 @@
                                 <td class="table-cell-padding">{$row.code_display_name|escape:'htmlall':'UTF-8'}</td>
                                 <td class="table-cell-padding">{$row.partner_display_name|escape:'htmlall':'UTF-8'}</td>
                                 <td class="table-cell-padding">{$row.email|default:'Brak'|escape:'htmlall':'UTF-8'}</td>
-                                <td class="table-cell-padding table-cell-right js-orders-bl-link" 
-                                    data-id-partner="{$row.id_partner|intval}" 
+                                <td class="table-cell-padding table-cell-right js-orders-bl-link"
+                                    data-id-partner="{$row.id_partner|intval}"
                                     data-id-cart-rule="{$row.id_cart_rule|intval}"
                                     data-js-date-from="{$js_date_from|escape:'htmlall':'UTF-8'}"
                                     data-js-date-to="{$js_date_to|escape:'htmlall':'UTF-8'}">
                                     {$row.total_orders_value_formatted|escape:'htmlall':'UTF-8'}
                                 </td>
-                                <td class="table-cell-padding table-cell-right">{$row.provision_base_formatted nofilter}</td>
-                                <td class="table-cell-padding table-cell-left">{$row.final_provision_display nofilter}</td>
-                                <td class="table-cell-padding table-cell-right">{$row.net_commission_display_formatted nofilter}</td>
                                 <td class="table-cell-padding table-cell-right js-provision-sum-link"
-                                    data-id-partner="{$row.id_partner|intval}" 
+                                    data-id-partner="{$row.id_partner|intval}"
                                     data-id-cart-rule="{$row.id_cart_rule|intval}"
                                     data-js-date-from="{$js_date_from|escape:'htmlall':'UTF-8'}"
                                     data-js-date-to="{$js_date_to|escape:'htmlall':'UTF-8'}">
-                                    {$row.control_pp_value_formatted nofilter}
+                                    {$row.control_pp_value_formatted nofilter} {* Poprawne dane: Suma zamówień PP (kontrolka) *}
                                 </td>
+                                <td class="table-cell-padding table-cell-right">{$row.provision_base_formatted nofilter}</td>
+                                <td class="table-cell-padding table-cell-left">{$row.final_provision_display nofilter}</td> {* Poprawne dane: Prowizja (próg + kwota) *}
+                                <td class="table-cell-padding table-cell-right">{$row.net_commission_display_formatted nofilter}</td> {* Poprawne dane: Prowizja netto (kwota) *}
                                 <td class="table-cell-padding {if $row.control_verification_class} {$row.control_verification_class}{/if}">{$row.control_verification_status|escape:'htmlall':'UTF-8'}</td>
                             </tr>
                         {/foreach}
@@ -155,7 +155,7 @@
         </div>
     {else}
         <div class="alert alert-warning">
-            {l s='Brak danych dla wybranego okresu.' mod='bestprogrampartnerski'}
+            Brak danych dla wybranego okresu.
         </div>
     {/if}
 </div>
@@ -164,14 +164,13 @@
 <div id="modal-content-container" style="display:none;"></div>
 
 {* Przekazujemy zmienne z PHP do JS w postaci atrybutów data, aby uniknąć konfliktu ze Smarty w bloku script *}
-<div id="js-data-container" 
+<div id="js-data-container"
     data-current-url="{$current_url|escape:'htmlall':'UTF-8'}"
     data-admin-controller="AdminBestProgramPartnerski"
     data-admin-token="{$smarty.get.token|escape:'htmlall':'UTF-8'}"
     data-selected-filter-mode="{$selected_filter_mode|escape:'htmlall':'UTF-8'}"
-    data-js-date-from="{$js_date_from|escape:'htmlall':'UTF-8'}" 
+    data-js-date-from="{$js_date_from|escape:'htmlall':'UTF-8'}"
     data-js-date-to="{$js_date_to|escape:'htmlall':'UTF-8'}"></div>
-
 
 <script type="text/javascript">
     {literal}
@@ -232,7 +231,7 @@
             var date_from = jQuery(this).data('js-date-from');
             var date_to = jQuery(this).data('js-date-to');
 
-            // Tekst nagłówka modala bez Smarty
+            // Tekst nagłówka modala
             var modalTitle = 'Szczegóły zamówień BL - ' + jQuery(this).closest('tr').find('td').eq(1).text() + ' - ' + jQuery(this).closest('tr').find('td').eq(0).text();
 
             jQuery.ajax({
@@ -271,7 +270,7 @@
             var date_from = jQuery(this).data('js-date-from');
             var date_to = jQuery(this).data('js-date-to');
 
-            // Tekst nagłówka modala bez Smarty
+            // Tekst nagłówka modala
             var modalTitle = 'Szczegóły wpisów prowizyjnych PP - ' + jQuery(this).closest('tr').find('td').eq(1).text() + ' - ' + jQuery(this).closest('tr').find('td').eq(0).text();
 
             jQuery.ajax({
@@ -308,10 +307,10 @@
             modal: true,
             height: 'auto',
             width: 800,
-            closeText: 'Zamknij', // Tekst przycisku "Zamknij" bez Smarty
+            closeText: 'Zamknij',
             buttons: [
                 {
-                    text: 'Zamknij', // Tekst przycisku "Zamknij" bez Smarty
+                    text: 'Zamknij',
                     click: function() {
                         jQuery(this).dialog('close');
                     }
