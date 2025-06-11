@@ -60,3 +60,31 @@
 	/* text-decoration-skip-ink: auto;*/
     /* Możesz dodać :hover efekt */
 }
+/* views/css/admin.css */
+
+.modal-report-table {
+    font-size: 8pt; /* Font 8pt dla tabel w modalach */
+    border-collapse: collapse; /* Aby ramki się stykały */
+    width: 100%; /* Rozciągnij na całą szerokość modala */
+}
+
+.modal-report-table th,
+.modal-report-table td {
+    border: 1px solid #ddd; /* Dodaje ramki */
+    padding: 5px; /* Dodatkowy padding dla lepszej czytelności */
+    text-align: left; /* Domyślne wyrównanie tekstu w komórkach */
+}
+
+.modal-report-table thead th {
+    background-color: #f5f5f5; /* Lekkie tło dla nagłówków */
+}
+
+/* Możesz dodać więcej stylów, np. dla list produktów w komórkach */
+.modal-report-table ul.list-unstyled {
+    margin-bottom: 0;
+    padding-left: 10px; /* Lekkie wcięcie dla listy */
+}
+
+.modal-report-table ul.list-unstyled li {
+    padding: 2px 0;
+}

@@ -179,27 +179,27 @@
     var currentController;
     var currentToken;
     var selectedFilterMode;
-    var jsDateFrom; 
-    var jsDateTo;   
+    var jsDateFrom;
+    var jsDateTo;
 
-    $(document).ready(function() {
+    jQuery(document).ready(function() {
         // Inicjalizacja zmiennych JS z danych HTML
-        var jsDataContainer = $('#js-data-container');
+        var jsDataContainer = jQuery('#js-data-container');
         currentUrl = jsDataContainer.data('current-url');
         currentController = jsDataContainer.data('admin-controller');
         currentToken = jsDataContainer.data('admin-token');
         selectedFilterMode = jsDataContainer.data('selected-filter-mode');
         jsDateFrom = jsDataContainer.data('js-date-from');
-        jsDateTo = jsDataContainer.data('js-date-to');   
-        
+        jsDateTo = jsDataContainer.data('js-date-to');
+
         // Fallback dla tokena, jeśli nie został poprawnie przekazany
         if (!currentToken && typeof admin_token !== 'undefined') {
             currentToken = admin_token;
         }
 
-        // Inicjalizacja datepickerów (dostępne tylko gdy tryb "custom" jest aktywny lub ustawiony jako domyślny)
-        var dateFromInput = $('#date_from_input');
-        var dateToInput = $('#date_to_input');
+        // Inicjalizacja datepickerów
+        var dateFromInput = jQuery('#date_from_input');
+        var dateToInput = jQuery('#date_to_input');
 
         dateFromInput.datepicker({
             dateFormat: 'yy-mm-dd',
@@ -207,7 +207,7 @@
             selectOtherMonths: true,
             onSelect: function (selectedDate) {
                 dateToInput.datepicker('option', 'minDate', selectedDate);
-                reloadPageWithFilters(); 
+                reloadPageWithFilters();
             }
         });
 
@@ -217,62 +217,28 @@
             selectOtherMonths: true,
             onSelect: function (selectedDate) {
                 dateFromInput.datepicker('option', 'maxDate', selectedDate);
-                reloadPageWithFilters(); 
+                reloadPageWithFilters();
             }
         });
 
         // Wywołaj funkcję przełączającą tryb przy załadowaniu strony
-        toggleFilterMode(false); 
+        toggleFilterMode(false);
 
 
         // --- OBSŁUGA MODALA DLA "Suma zamówień BL" ---
-        $('.js-orders-bl-link').on('click', function() {
-            var id_partner = $(this).data('id-partner');
-            var id_cart_rule = $(this).data('id-cart-rule');
-            var date_from = $(this).data('js-date-from'); 
-            var date_to = $(this).data('js-date-to');     
-            
-            var modalTitle = '{l s=\'Szczegóły zamówień BL\' mod=\'bestprogrampartnerski\'} - ' + $(this).closest('tr').find('td').eq(1).text() + ' - ' + $(this).closest('tr').find('td').eq(0).text(); 
-            
-            $.ajax({
-                url: currentUrl + '&ajax=1&action=GetOrderDetailsBlForModal', 
+        jQuery('.js-orders-bl-link').on('click', function() {
+            var id_partner = jQuery(this).data('id-partner');
+            var id_cart_rule = jQuery(this).data('id-cart-rule');
+            var date_from = jQuery(this).data('js-date-from');
+            var date_to = jQuery(this).data('js-date-to');
+
+            // Tekst nagłówka modala bez Smarty
+            var modalTitle = 'Szczegóły zamówień BL - ' + jQuery(this).closest('tr').find('td').eq(1).text() + ' - ' + jQuery(this).closest('tr').find('td').eq(0).text();
+
+            jQuery.ajax({
+                url: currentUrl + '&ajax=1&action=GetOrderDetailsBlForModal',
                 type: 'POST',
-                dataType: 'html', // Oczekujemy HTML
-                data: {
-                    id_partner: id_partner,
-                    id_cart_rule: id_cart_rule,
-                    date_from: date_from, 
-                    date_to: date_to,     
-                    token: currentToken
-                },
-                beforeSend: function() {
-                    $('#modal-content-container').html('<p>{l s=\'Ładowanie danych...\' mod=\'bestprogrampartnerski\'}</p>');
-                    $('#modal-content-container').dialog({title: modalTitle, width: 800, zIndex: 1000000 }).dialog('open'); 
-                },
-                success: function(response) {
-                    $('#modal-content-container').html(response); // Wstawiamy gotowy HTML
-                },
-                error: function(xhr, status, error) {
-                    $('#modal-content-container').html('<p>{l s=\'Wystąpił błąd podczas ładowania danych.\' mod=\'bestprogrampartnerski\'}</p><p>' + xhr.responseText + '</p>');
-                    console.error('AJAX Error BL:', status, error, xhr.responseText);
-                }
-            });
-        });
-
-
-        // --- OBSŁUGA MODALA DLA "Suma zamówień PP" ---
-        $('.js-provision-sum-link').on('click', function() {
-            var id_partner = $(this).data('id-partner');
-            var id_cart_rule = $(this).data('id-cart-rule');
-            var date_from = $(this).data('js-date-from'); 
-            var date_to = $(this).data('js-date-to');     
-            
-            var modalTitle = '{l s=\'Szczegóły wpisów prowizyjnych PP\' mod=\'bestprogrampartnerski\'} - ' + $(this).closest('tr').find('td').eq(1).text() + ' - ' + $(this).closest('tr').find('td').eq(0).text(); 
-
-            $.ajax({
-                url: currentUrl + '&ajax=1&action=GetProvisionDetailsForModal', 
-                type: 'POST',
-                dataType: 'html', // Oczekujemy HTML
+                dataType: 'html',
                 data: {
                     id_partner: id_partner,
                     id_cart_rule: id_cart_rule,
@@ -281,30 +247,73 @@
                     token: currentToken
                 },
                 beforeSend: function() {
-                    $('#modal-content-container').html('<p>{l s=\'Ładowanie danych...\' mod=\'bestprogrampartnerski\'}</p>');
-                    $('#modal-content-container').dialog({title: modalTitle, width: 600, zIndex: 1000000 }).dialog('open'); 
+                    jQuery('#modal-content-container').html('<p>Ładowanie danych...</p>');
+                    jQuery('#modal-content-container').dialog('option', 'title', modalTitle);
+                    jQuery('#modal-content-container').dialog('option', 'width', 800);
+                    jQuery('#modal-content-container').dialog('option', 'height', 600);
+                    jQuery('#modal-content-container').dialog('open');
                 },
                 success: function(response) {
-                    $('#modal-content-container').html(response); // Wstawiamy gotowy HTML
+                    jQuery('#modal-content-container').html(response);
                 },
                 error: function(xhr, status, error) {
-                    $('#modal-content-container').html('<p>{l s=\'Wystąpił błąd podczas ładowania danych.\' mod=\'bestprogrampartnerski\'}</p><p>' + xhr.responseText + '</p>');
+                    jQuery('#modal-content-container').html('<p>Wystąpił błąd podczas ładowania danych.</p><p>' + xhr.responseText + '</p>');
+                    console.error('AJAX Error BL:', status, error, xhr.responseText);
+                }
+            });
+        });
+
+
+        // --- OBSŁUGA MODALA DLA "Suma zamówień PP" ---
+        jQuery('.js-provision-sum-link').on('click', function() {
+            var id_partner = jQuery(this).data('id-partner');
+            var id_cart_rule = jQuery(this).data('id-cart-rule');
+            var date_from = jQuery(this).data('js-date-from');
+            var date_to = jQuery(this).data('js-date-to');
+
+            // Tekst nagłówka modala bez Smarty
+            var modalTitle = 'Szczegóły wpisów prowizyjnych PP - ' + jQuery(this).closest('tr').find('td').eq(1).text() + ' - ' + jQuery(this).closest('tr').find('td').eq(0).text();
+
+            jQuery.ajax({
+                url: currentUrl + '&ajax=1&action=GetProvisionDetailsForModal',
+                type: 'POST',
+                dataType: 'html',
+                data: {
+                    id_partner: id_partner,
+                    id_cart_rule: id_cart_rule,
+                    date_from: date_from,
+                    date_to: date_to,
+                    token: currentToken
+                },
+                beforeSend: function() {
+                    jQuery('#modal-content-container').html('<p>Ładowanie danych...</p>');
+                    jQuery('#modal-content-container').dialog('option', 'title', modalTitle);
+                    jQuery('#modal-content-container').dialog('option', 'width', 600);
+                    jQuery('#modal-content-container').dialog('option', 'height', 600);
+                    jQuery('#modal-content-container').dialog('open');
+                },
+                success: function(response) {
+                    jQuery('#modal-content-container').html(response);
+                },
+                error: function(xhr, status, error) {
+                    jQuery('#modal-content-container').html('<p>Wystąpił błąd podczas ładowania danych.</p><p>' + xhr.responseText + '</p>');
                     console.error('AJAX Error PP:', status, error, xhr.responseText);
                 }
             });
         });
 
-        // Inicjalizacja jQuery UI Dialog dla obu modalów (tytuł i szerokość są ustawiane w beforeSend)
-        $('#modal-content-container').dialog({
+        // Inicjalizacja jQuery UI Dialog dla OBU modalów.
+        jQuery('#modal-content-container').dialog({
             autoOpen: false,
             modal: true,
             height: 'auto',
-            closeText: '{l s=\'Zamknij\' mod=\'bestprogrampartnerski\'}',
+            width: 800,
+            closeText: 'Zamknij', // Tekst przycisku "Zamknij" bez Smarty
             buttons: [
                 {
-                    text: '{l s=\'Zamknij\' mod=\'bestprogrampartnerski\'}',
+                    text: 'Zamknij', // Tekst przycisku "Zamknij" bez Smarty
                     click: function() {
-                        $(this).dialog('close');
+                        jQuery(this).dialog('close');
                     }
                 }
             ]
@@ -314,16 +323,16 @@
 
     // Funkcja przełączająca widoczność pól filtrów
     function toggleFilterMode(reload = true) {
-        selectedFilterMode = $('input[name="filter_mode"]:checked').val();
-        
+        selectedFilterMode = jQuery('input[name="filter_mode"]:checked').val();
+
         if (selectedFilterMode === 'monthly') {
-            $('.filter-mode-monthly').show();
-            $('.filter-mode-custom').hide();
+            jQuery('.filter-mode-monthly').show();
+            jQuery('.filter-mode-custom').hide();
         } else if (selectedFilterMode === 'custom') {
-            $('.filter-mode-monthly').hide();
-            $('.filter-mode-custom').show();
-            $('#date_from_input').datepicker('refresh');
-            $('#date_to_input').datepicker('refresh');
+            jQuery('.filter-mode-monthly').hide();
+            jQuery('.filter-mode-custom').show();
+            jQuery('#date_from_input').datepicker('refresh');
+            jQuery('#date_to_input').datepicker('refresh');
         }
 
         if (reload) {
@@ -334,25 +343,25 @@
     // Funkcja do budowania URL i przeładowania strony (globalna)
     function reloadPageWithFilters() {
         var newUrl = currentUrl;
-        
+
         newUrl = newUrl.replace(/&filter_year=\d{4}/, '');
         newUrl = newUrl.replace(/&filter_month=\d{1,2}/, '');
         newUrl = newUrl.replace(/&date_from=[^&]*/, '');
         newUrl = newUrl.replace(/&date_to=[^&]*/, '');
         newUrl = newUrl.replace(/&filter_mode=[^&]*/, '');
         newUrl = newUrl.replace(/&submitFilter=1/, '');
-        newUrl = newUrl.replace(/&token=[a-f0-9]{32}/, ''); 
+        newUrl = newUrl.replace(/&token=[a-f0-9]{32}/, '');
 
         newUrl += '&filter_mode=' + selectedFilterMode;
 
         if (selectedFilterMode === 'monthly') {
-            var selectedYear = $('#filter_year_select').val();
-            var selectedMonth = $('#filter_month_select').val();
+            var selectedYear = jQuery('#filter_year_select').val();
+            var selectedMonth = jQuery('#filter_month_select').val();
             newUrl += '&filter_year=' + selectedYear;
             newUrl += '&filter_month=' + selectedMonth;
         } else if (selectedFilterMode === 'custom') {
-            var selectedDateFrom = $('#date_from_input').val();
-            var selectedDateTo = $('#date_to_input').val();
+            var selectedDateFrom = jQuery('#date_from_input').val();
+            var selectedDateTo = jQuery('#date_to_input').val();
             if (selectedDateFrom) {
                 newUrl += '&date_from=' + selectedDateFrom;
             }
@@ -360,10 +369,10 @@
                 newUrl += '&date_to=' + selectedDateTo;
             }
         }
-        
-        newUrl += '&submitFilter=1'; 
-        newUrl += '&token=' + currentToken; 
-        
+
+        newUrl += '&submitFilter=1';
+        newUrl += '&token=' + currentToken;
+
         window.location.href = newUrl;
     }
     {/literal}

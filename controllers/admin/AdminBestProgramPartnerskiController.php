@@ -29,10 +29,10 @@ if (!defined('_PS_VERSION_')) {
 
 class AdminBestProgramPartnerskiController extends ModuleAdminController
 {
-    private $commissionTiers; 
-    private $exceptionCodesForControlDisplay; 
-    private $ignoredCodes; 
-    private $excludedProductIdsFromSum; 
+    private $commissionTiers;
+    private $exceptionCodesForControlDisplay;
+    private $ignoredCodes;
+    private $excludedProductIdsFromSum;
 
     public function __construct()
     {
@@ -44,13 +44,13 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
 
         parent::__construct();
 
-        $this->toolbar_title = $this->l('Raportowanie PP'); 
-        
+        $this->toolbar_title = $this->l('Raportowanie PP');
+
         $configFilePath = _PS_MODULE_DIR_ . $this->module->name . '/config/commission_tiers.php';
         if (file_exists($configFilePath)) {
             $config = require($configFilePath);
             $this->commissionTiers = $config['commissionTiers'];
-            $this->exceptionCodesForControlDisplay = array_map('intval', $config['exception_codes_for_control_display']); 
+            $this->exceptionCodesForControlDisplay = array_map('intval', $config['exception_codes_for_control_display']);
             $this->ignoredCodes = array_map('intval', $config['ignored_codes']);
             $this->excludedProductIdsFromSum = array_map('intval', $config['excluded_product_ids_from_sum']);
         } else {
@@ -69,15 +69,13 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         }
     }
 
-    public function setMedia($is         = false)
+    public function setMedia($is = false)
     {
         parent::setMedia($is);
         $this->addJqueryUI('jquery.ui.datepicker');
         $this->addJquery('hoverIntent');
         $this->addJquery('chosen');
-        // --- KLUCZOWA ZMIANA: JAWNE ZAŁADOWANIE DIALOGU JQUERY UI ---
-        $this->addJqueryUI('ui.dialog'); // Preferowany sposób w PrestaShop
-        // --- KONIEC KLUCZOWEJ ZMIANY ---
+        $this->addJqueryUI('ui.dialog');
         $this->addCSS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/views/css/admin.css');
     }
 
@@ -91,23 +89,22 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         if (Tools::isSubmit('submitFilter')) {
             // Logika przetwarzania formularza, jeśli jest potrzebna
         }
-        
+
         return parent::postProcess();
     }
 
     // --- NOWA METODA AJAX DLA MODALA: SZCZEGÓŁY ZAMÓWIEŃ BL (ORDER_DETAIL) ---
     public function ajaxProcessGetOrderDetailsBlForModal()
     {
-        // header('Content-Type: application/json'); // Zmieniamy na text/html
         header('Content-Type: text/html; charset=utf-8');
 
         $id_partner = (int)Tools::getValue('id_partner');
         $id_cart_rule = (int)Tools::getValue('id_cart_rule');
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
-        
+
         if (!Validate::isDate($date_from) || !Validate::isDate($date_to)) {
-            $date_from = date('Y-m-01 00:00:00'); 
+            $date_from = date('Y-m-01 00:00:00');
             $date_to = date('Y-m-t 23:59:59');
         }
 
@@ -120,9 +117,9 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                 od.product_id,
                 od.product_name,
                 od.product_quantity,
-                od.total_price_tax_excl, 
-                od.total_price_tax_incl, 
-                o.total_paid_tax_excl AS order_total_paid_tax_excl_overall 
+                od.total_price_tax_excl,
+                od.total_price_tax_incl,
+                o.total_paid_tax_excl AS order_total_paid_tax_excl_overall
             ');
             $query->from('orders', 'o');
             $query->innerJoin('order_detail', 'od', 'o.id_order = od.id_order');
@@ -130,13 +127,13 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $query->innerJoin('cart_rule', 'cr', 'ocr.id_cart_rule = cr.id_cart_rule');
             $query->innerJoin('pshow_rp_partner', 'prt', 'cr.id_cart_rule = prt.id_voucher');
 
-            $query->where('o.date_add >= \''.pSQL($date_from).'\' AND o.date_add <= \''.pSQL($end_date).'\'');
+            $query->where('o.date_add >= \'' . pSQL($date_from) . '\' AND o.date_add <= \'' . pSQL($date_to) . '\''); // Poprawka $date_to
             $query->where('o.current_state = 4 AND o.valid = 1');
-            $query->where('od.product_id NOT IN ('.implode(',', $this->excludedProductIdsFromSum).')'); 
+            $query->where('od.product_id NOT IN (' . implode(',', $this->excludedProductIdsFromSum) . ')');
             $query->where('prt.id_partner = ' . (int)$id_partner);
             $query->where('cr.id_cart_rule = ' . (int)$id_cart_rule);
-            
-            $query->groupBy('o.id_order, od.id_order_detail, od.product_id, od.product_name, od.product_quantity, od.total_price_tax_excl, od.total_price_tax_incl, o.total_paid_tax_excl'); 
+
+            $query->groupBy('o.id_order, od.id_order_detail, od.product_id, od.product_name, od.product_quantity, od.total_price_tax_excl, od.total_price_tax_incl, o.total_paid_tax_excl');
             $query->orderBy('o.id_order ASC, od.product_name ASC');
 
             $results = $db->executeS($query);
@@ -149,19 +146,19 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                         'id_order' => $order_id,
                         'order_total_paid_tax_excl_overall' => Tools::displayPrice($item['order_total_paid_tax_excl_overall'], $this->context->currency),
                         'products' => [],
-                        'calculated_sum_from_detail' => 0.0, 
+                        'calculated_sum_from_detail' => 0.0,
                     ];
                 }
-                
+
                 $product_line_net_after_discount = (float)$item['total_price_tax_excl'] * (1 - 0.15);
-                
+
                 $grouped_orders[$order_id]['products'][] = [
                     'name' => $item['product_name'],
                     'quantity' => (int)$item['product_quantity'],
-                    'total_price_tax_excl_original' => Tools::displayPrice($item['total_price_tax_excl'], $this->context->currency), 
-                    'total_price_tax_excl_discounted' => Tools::displayPrice($product_line_net_after_discount, $this->context->currency), 
+                    'total_price_tax_excl_original' => Tools::displayPrice($item['total_price_tax_excl'], $this->context->currency),
+                    'total_price_tax_excl_discounted' => Tools::displayPrice($product_line_net_after_discount, $this->context->currency),
                 ];
-                $grouped_orders[$order_id]['calculated_sum_from_detail'] += $product_line_net_after_discount; 
+                $grouped_orders[$order_id]['calculated_sum_from_detail'] += $product_line_net_after_discount;
             }
 
             foreach ($grouped_orders as &$order) {
@@ -171,43 +168,45 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $order_details_bl = array_values($grouped_orders);
         }
 
-        // --- BUDOWANIE HTML W PHP ---
+        // --- BUDOWANIE HTML W PHP DLA MODALA BL ---
         $html_output = '';
         if (empty($order_details_bl)) {
-            $html_output = '<p>' . $this->l('Brak szczegółowych danych dla tego okresu i kodu.') . '</p>';
+            $html_output = '<p>Brak szczegółowych danych dla tego okresu i kodu.</p>'; // Tekst bez Smarty
         } else {
-            $html_output .= '<table class="table table-bordered table-striped">';
-            $html_output .= '<thead><tr><th>' . $this->l('Koszyk ID') . '</th><th>' . $this->l('Wartość (całość)') . '</th><th colspan="2">' . $this->l('Produkty (Netto / Netto po -15%)') . '</th></tr></thead><tbody>';
+            // Liczba koszyków
+            $html_output .= '<p><strong>Koszyków: ' . count($order_details_bl) . '</strong></p>';
+
+            $html_output .= '<table class="table table-bordered table-striped modal-report-table">'; // Dodano klasę dla stylizacji
+            $html_output .= '<thead><tr><th>Koszyk ID</th><th>Wartość (całość)</th><th colspan="2">Produkty (Netto / Netto po -15%)</th></tr></thead><tbody>'; // Tekst bez Smarty
             foreach ($order_details_bl as $order) {
                 $html_output .= '<tr>';
                 $html_output .= '<td>' . $order['id_order'] . '</td>';
                 $html_output .= '<td>' . $order['order_total_paid_tax_excl_overall'] . '</td>';
                 $html_output .= '<td colspan="2"><ul class="list-unstyled">';
                 foreach ($order['products'] as $product) {
-                    $html_output .= '<li>' . $product['name'] . ' x ' . $product['quantity'] . ' (' . $this->l('Netto:') . ' ' . $product['total_price_tax_excl_original'] . ') (' . $this->l('Netto po -15%') . ': ' . $product['total_price_tax_excl_discounted'] . ')</li>';
+                    $html_output .= '<li>' . $product['name'] . ' x ' . $product['quantity'] . ' (Netto: ' . $product['total_price_tax_excl_original'] . ') (Netto po -15%: ' . $product['total_price_tax_excl_discounted'] . ')</li>'; // Tekst bez Smarty
                 }
                 $html_output .= '</ul></td>';
                 $html_output .= '</tr>';
-                $html_output .= '<tr><td colspan="4" class="text-right"><strong>' . $this->l('Suma koszyka BL:') . ' ' . $order['calculated_sum_from_detail_formatted'] . '</strong></td></tr>';
+                $html_output .= '<tr><td colspan="4" class="text-right"><strong>Suma koszyka BL: ' . $order['calculated_sum_from_detail_formatted'] . '</strong></td></tr>'; // Tekst bez Smarty
             }
             $html_output .= '</tbody></table>';
         }
 
-        die($html_output); // Zwracamy czysty HTML
+        die($html_output);
     }
 
     public function ajaxProcessGetProvisionDetailsForModal()
     {
-        // header('Content-Type: application/json'); // Zmieniamy na text/html
         header('Content-Type: text/html; charset=utf-8');
 
         $id_partner = (int)Tools::getValue('id_partner');
         $id_cart_rule = (int)Tools::getValue('id_cart_rule');
         $date_from = Tools::getValue('date_from');
         $date_to = Tools::getValue('date_to');
-        
+
         if (!Validate::isDate($date_from) || !Validate::isDate($date_to)) {
-            $date_from = date('Y-m-01 00:00:00'); 
+            $date_from = date('Y-m-01 00:00:00');
             $date_to = date('Y-m-t 23:59:59');
         }
 
@@ -222,14 +221,14 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             ');
             $query->from('pshow_rp_provision', 'prv');
             $query->innerJoin('orders', 'o', 'prv.id_order = o.id_order');
-            $query->innerJoin('order_cart_rule', 'ocr', 'o.id_order = ocr.id_order'); 
-            
-            $query->where('prv.date_add >= \''.pSQL($date_from).'\' AND prv.date_add <= \''.pSQL($end_date).'\'');
+            $query->innerJoin('order_cart_rule', 'ocr', 'o.id_order = ocr.id_order');
+
+            $query->where('prv.date_add >= \'' . pSQL($date_from) . '\' AND prv.date_add <= \'' . pSQL($date_to) . '\''); // Poprawka $date_to
             $query->where('prv.confirmed = 1');
-            $query->where('o.current_state = 4 AND o.valid = 1'); 
+            $query->where('o.current_state = 4 AND o.valid = 1');
             $query->where('prv.id_partner = ' . (int)$id_partner);
             $query->where('ocr.id_cart_rule = ' . (int)$id_cart_rule);
-            
+
             $query->groupBy('prv.id_order, prv.order_value, prv.provision_value');
             $query->orderBy('prv.id_order ASC');
 
@@ -243,21 +242,24 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                 ];
             }
         }
-        
-        // --- KLUCZOWA ZMIANA: Budowanie HTML w PHP zamiast JSON ---
+
+        // --- BUDOWANIE HTML W PHP DLA MODALA PP ---
         $html_output = '';
         if (empty($provision_details)) {
-            $html_output = '<p>' . $this->l('Brak szczegółowych danych dla tego okresu i kodu.') . '</p>';
+            $html_output = '<p>Brak szczegółowych danych dla tego okresu i kodu.</p>'; // Tekst bez Smarty
         } else {
-            $html_output .= '<table class="table table-bordered table-striped">';
-            $html_output .= '<thead><tr><th>' . $this->l('Koszyk ID') . '</th><th>' . $this->l('Wartość koszyka') . '</th><th>' . $this->l('Prowizja (kwota)') . '</th></tr></thead><tbody>';
+            // Liczba koszyków
+            $html_output .= '<p><strong>Koszyków: ' . count($provision_details) . '</strong></p>';
+
+            $html_output .= '<table class="table table-bordered table-striped modal-report-table">'; // Dodano klasę dla stylizacji
+            $html_output .= '<thead><tr><th>Koszyk ID</th><th>Wartość koszyka</th><th>Prowizja (kwota)</th></tr></thead><tbody>'; // Tekst bez Smarty
             foreach ($provision_details as $item) {
                 $html_output .= '<tr><td>' . $item['id_order'] . '</td><td>' . $item['order_value'] . '</td><td>' . $item['provision_value'] . '</td></tr>';
             }
             $html_output .= '</tbody></table>';
         }
 
-        die($html_output); // Zwracamy czysty HTML
+        die($html_output);
     }
 
 
@@ -285,7 +287,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         if ($selected_filter_mode === 'monthly') {
             $sql_start_date = (new DateTimeImmutable())->setDate($selected_year, $selected_month, 1)->setTime(0, 0, 0)->format('Y-m-d H:i:s');
             $sql_end_date = (new DateTimeImmutable())->setDate($selected_year, $selected_month, (int)date('t', mktime(0, 0, 0, $selected_month, 1, $selected_year)))->setTime(23, 59, 59)->format('Y-m-d H:i:s');
-            
+
             $report_display_start = $this->getMonthsArray()[$selected_month];
             $report_display_end = $selected_year;
 
@@ -315,6 +317,8 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $report_display_end = $default_year;
         }
 
+        $report_data = $this->getSimplifiedReportData($sql_start_date, $sql_end_date);
+
         $this->context->smarty->assign([
             'selected_filter_mode' => $selected_filter_mode,
             'selected_year' => $selected_year,
@@ -324,7 +328,7 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             'months' => $this->getMonthsArray(),
             'years' => range(2025, 2030),
             'current_url' => $this->context->link->getAdminLink('AdminBestProgramPartnerski'),
-            'report_data' => $this->getSimplifiedReportData($sql_start_date, $sql_end_date),
+            'report_data' => $report_data,
             'report_dates_info' => [
                 'start_display' => $report_display_start,
                 'end_display' => $report_display_end,
@@ -382,10 +386,10 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
         $query_base->from('pshow_rp_partner', 'prt');
         $query_base->leftJoin('customer', 'c', 'prt.id_customer = c.id_customer');
         $query_base->innerJoin('cart_rule', 'cr', 'prt.id_voucher = cr.id_cart_rule');
-        $query_base->where('prt.id_voucher IS NOT NULL'); 
+        $query_base->where('prt.id_voucher IS NOT NULL');
         $query_base->groupBy('cr.code, cr.id_cart_rule, prt.id_partner, prt.id_customer, c.firstname, c.lastname, c.email, prt.provision');
         $query_base->orderBy('cr.code ASC, c.lastname ASC, c.firstname ASC, prt.id_customer ASC');
-        
+
         $base_results = $db->executeS($query_base);
 
         if (empty($base_results)) {
@@ -394,8 +398,8 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
 
         // Przygotowanie danych do połączenia w PHP i filtrowania ignorowanych kodów
         $report_data = [];
-        $partner_ids = []; 
-        $cart_rule_ids = []; 
+        $partner_ids = [];
+        $cart_rule_ids = [];
 
         foreach ($base_results as $row) {
             // Filtracja: pomijamy kody, które są na liście $ignoredCodes
@@ -403,11 +407,11 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                 continue; // Pomijamy ten wiersz
             }
 
-            $key = (int)$row['id_partner'] . '_' . (int)$row['id_cart_rule']; 
+            $key = (int)$row['id_partner'] . '_' . (int)$row['id_cart_rule'];
             $report_data[$key] = $row;
             $report_data[$key]['total_orders_value_display'] = 0.0; // Inicjalizacja
             $report_data[$key]['provision_order_value_for_tiers'] = 0.0; // Inicjalizacja
-            
+
             $partner_ids[] = (int)$row['id_partner'];
             $cart_rule_ids[] = (int)$row['id_cart_rule'];
         }
@@ -434,13 +438,13 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $query_calculated_orders_value->innerJoin('cart_rule', 'cr', 'ocr.id_cart_rule = cr.id_cart_rule');
             $query_calculated_orders_value->innerJoin('pshow_rp_partner', 'prt', 'cr.id_cart_rule = prt.id_voucher');
 
-            $query_calculated_orders_value->where('o.date_add >= \''.pSQL($start_date).'\' AND o.date_add <= \''.pSQL($end_date).'\'');
+            $query_calculated_orders_value->where('o.date_add >= \'' . pSQL($start_date) . '\' AND o.date_add <= \'' . pSQL($end_date) . '\'');
             $query_calculated_orders_value->where('o.current_state = 4 AND o.valid = 1');
-            $query_calculated_orders_value->where('od.product_id NOT IN ('.implode(',', $this->excludedProductIdsFromSum).')'); 
-            $query_calculated_orders_value->where('prt.id_partner IN ('.implode(',', $partner_ids).')');
-            $query_calculated_orders_value->where('cr.id_cart_rule IN ('.implode(',', $cart_rule_ids).')');
+            $query_calculated_orders_value->where('od.product_id NOT IN (' . implode(',', $this->excludedProductIdsFromSum) . ')');
+            $query_calculated_orders_value->where('prt.id_partner IN (' . implode(',', $partner_ids) . ')');
+            $query_calculated_orders_value->where('cr.id_cart_rule IN (' . implode(',', $cart_rule_ids) . ')');
             $query_calculated_orders_value->groupBy('prt.id_partner, ocr.id_cart_rule');
-            
+
             $calculated_orders_results = $db->executeS($query_calculated_orders_value);
 
             foreach ($calculated_orders_results as $row) {
@@ -456,19 +460,19 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             $query_provision_control_value = new DbQuery();
             $query_provision_control_value->select('
                 prv.id_partner,
-                ocr.id_cart_rule, 
+                ocr.id_cart_rule,
                 SUM(prv.order_value) AS provision_control_sum
             ');
             $query_provision_control_value->from('pshow_rp_provision', 'prv');
             $query_provision_control_value->innerJoin('orders', 'o', 'prv.id_order = o.id_order');
-            $query_provision_control_value->innerJoin('order_cart_rule', 'ocr', 'o.id_order = ocr.id_order'); 
-            $query_provision_control_value->where('prv.date_add >= \''.pSQL($start_date).'\' AND prv.date_add <= \''.pSQL($end_date).'\'');
+            $query_provision_control_value->innerJoin('order_cart_rule', 'ocr', 'o.id_order = ocr.id_order');
+            $query_provision_control_value->where('prv.date_add >= \'' . pSQL($start_date) . '\' AND prv.date_add <= \'' . pSQL($end_date) . '\'');
             $query_provision_control_value->where('prv.confirmed = 1');
-            $query_provision_control_value->where('o.current_state = 4 AND o.valid = 1'); 
-            $query_provision_control_value->where('prv.id_partner IN ('.implode(',', $partner_ids).')');
-            $query_provision_control_value->where('ocr.id_cart_rule IN ('.implode(',', $cart_rule_ids).')');
+            $query_provision_control_value->where('o.current_state = 4 AND o.valid = 1');
+            $query_provision_control_value->where('prv.id_partner IN (' . implode(',', $partner_ids) . ')');
+            $query_provision_control_value->where('ocr.id_cart_rule IN (' . implode(',', $cart_rule_ids) . ')');
             $query_provision_control_value->groupBy('prv.id_partner, ocr.id_cart_rule');
-            
+
             $provision_control_results = $db->executeS($query_provision_control_value);
 
             foreach ($provision_control_results as $row) {
@@ -504,10 +508,10 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             }
 
             // --- KOLUMNA "PODSTAWA (%)" ---
-            $total_orders_value_display_float = (float)$row['total_orders_value_display']; 
-            $provision_order_value_for_tiers_float = (float)$row['provision_order_value_for_tiers']; 
+            $total_orders_value_display_float = (float)$row['total_orders_value_display'];
+            $provision_order_value_for_tiers_float = (float)$row['provision_order_value_for_tiers'];
             $provision_base_value_float = (float)$row['provision'];
-            $row['provision_base_formatted'] = $provision_base_value_float . '%'; 
+            $row['provision_base_formatted'] = $provision_base_value_float . '%';
 
             // --- KOLUMNA "PROWIZJA" ---
             $calculated_provision_amount = 0;
@@ -517,8 +521,8 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
                 $actual_tiered_rate = $this->getTieredCommissionRate($total_orders_value_display_float);
                 $calculated_provision_amount = $total_orders_value_display_float * $actual_tiered_rate;
 
-                if ($total_orders_value_display_float > 5000.00) { 
-                    $calculated_provision_class = 'threshold-highlight'; 
+                if ($total_orders_value_display_float > 5000.00) {
+                    $calculated_provision_class = 'threshold-highlight';
                 }
             } else {
                 $calculated_provision_amount = $total_orders_value_display_float * ($provision_base_value_float / 100);
@@ -528,16 +532,16 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
 
             // Logika warunkowa dla PIERWSZEJ linii kolumny "Prowizja"
             $first_line_display = '';
-            
-            $percentage_value_for_first_line = $provision_base_value_float . '%'; 
+
+            $percentage_value_for_first_line = $provision_base_value_float . '%';
             $percentage_value_for_first_line_html = '<strong class="prog-prowizji">' . $percentage_value_for_first_line . '</strong>';
 
             if (round($provision_base_value_float, 2) != 0.00) {
                 $first_line_display .= $this->l('Próg: ') . $percentage_value_for_first_line_html;
 
-                if (round($provision_base_value_float, 2) == 5.00 && $total_orders_value_display_float > 5000.00) { 
+                if (round($provision_base_value_float, 2) == 5.00 && $total_orders_value_display_float > 5000.00) {
                     $first_line_display = preg_replace(
-                        '/<strong class="prog-prowizji">([\d.,]+%)<\/strong>/', 
+                        '/<strong class="prog-prowizji">([\d.,]+%)<\/strong>/',
                         '<strong class="prog-prowizji"><del>$1</del></strong>',
                         $first_line_display
                     );
@@ -547,15 +551,15 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             } else {
                 $first_line_display .= '<span class="warning-text">' . $this->l('UWAGA: 0.00%') . '</span>';
             }
-            
+
             $row['final_provision_display'] = $first_line_display . '<br><span class="' . $calculated_provision_class . '">' . $calculated_provision_formatted . '</span>';
-            
+
             // --- KONIEC LOGIKI DLA KOLUMNY "PROWIZJA" ---
 
             // --- KOLUMNA "KONTROLKA P.P." ---
             $row['control_pp_value_raw'] = $provision_order_value_for_tiers_float;
             $row['control_pp_value_formatted'] = Tools::displayPrice($row['control_pp_value_raw'], $this->context->currency);
-            
+
             // --- LOGIKA WERYFIKACJI DLA KONTROLKI P.P. ---
             $row['control_verification_status'] = '';
             $row['control_verification_class'] = '';
@@ -563,16 +567,16 @@ class AdminBestProgramPartnerskiController extends ModuleAdminController
             // Weryfikacja kodów z listy wyjątków
             if (in_array((int)$row['id_cart_rule'], $this->exceptionCodesForControlDisplay)) {
                 $row['control_verification_status'] = $this->l('WYJĄTEK');
-                $row['control_verification_class'] = 'exception-highlight'; 
+                $row['control_verification_class'] = 'exception-highlight';
             } else {
                 // Standardowa logika weryfikacji (z tolerancją)
-                $tolerance = 0.05; 
+                $tolerance = 0.05;
                 if (abs($total_orders_value_display_float - $provision_order_value_for_tiers_float) < $tolerance) {
                     $row['control_verification_status'] = $this->l('OK');
                     $row['control_verification_class'] = 'success';
                 } else {
-                    $row['control_verification_status'] = sprintf($this->l('Rozbieżność: %s vs %s'), 
-                        Tools::displayPrice($total_orders_value_display_float, $this->context->currency, false), 
+                    $row['control_verification_status'] = sprintf($this->l('Rozbieżność: %s vs %s'),
+                        Tools::displayPrice($total_orders_value_display_float, $this->context->currency, false),
                         Tools::displayPrice($provision_order_value_for_tiers_float, $this->context->currency, false)
                     );
                     $row['control_verification_class'] = 'danger';

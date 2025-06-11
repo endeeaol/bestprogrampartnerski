@@ -52,7 +52,9 @@ class BestProgramPartnerski extends Module
 
     public function install()
     {
-        if (!parent::install() || !$this->installTabs()) {
+        // Rejestruj hook displayBackOfficeHeader podczas instalacji modułu
+        // To jest ważne, aby PrestaShop wiedział, że ma wywołać tę metodę
+        if (!parent::install() || !$this->installTabs() || !$this->registerHook('displayBackOfficeHeader')) {
             return false;
         }
 
@@ -61,7 +63,8 @@ class BestProgramPartnerski extends Module
 
     public function uninstall()
     {
-        if (!parent::uninstall() || !$this->uninstallTabs()) {
+        // Pamiętaj, aby również wyrejestrować hook podczas odinstalowywania
+        if (!parent::uninstall() || !$this->uninstallTabs() || !$this->unregisterHook('displayBackOfficeHeader')) {
             return false;
         }
 
@@ -70,7 +73,7 @@ class BestProgramPartnerski extends Module
 
     private function installTabs()
     {
-        $bestlabTabId = 492; 
+        $bestlabTabId = 492; // Upewnij się, że to ID jest poprawne dla Twojej instalacji
 
         $tab = new Tab();
         $tab->class_name = 'AdminBestProgramPartnerski';
@@ -96,5 +99,18 @@ class BestProgramPartnerski extends Module
         }
 
         return true;
+    }
+
+    /**
+     * Hook, który jest wywoływany w nagłówku w panelu administracyjnym.
+     * Używamy go, aby zapewnić, że moduł jest aktywny w tle, gdy kontroler jest używany.
+     * Załadowanie jQuery UI dialog pozostawiamy w kontrolerze.
+     */
+    public function hookDisplayBackOfficeHeader()
+    {
+        // Ta metoda jest wymagana, aby hook był aktywny,
+        // ale załadowanie 'ui.dialog' odbywa się w kontrolerze AdminBestProgramPartnerskiController::setMedia()
+        // Możesz tutaj dodać inne globalne zasoby JS/CSS dla całego back office,
+        // jeśli Twój moduł ich potrzebuje niezależnie od konkretnego kontrolera.
     }
 }
