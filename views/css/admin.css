@@ -1,0 +1,62 @@
+/* Standardowe paddingi dla komórek tabeli */
+#report_table th,
+#report_table td {
+    padding: 10px; /* Zwiększone paddingi o 3-4px */
+}
+
+/* Wyrównanie kolumn */
+#report_table .table-cell-right {
+    text-align: right;
+}
+#report_table .table-cell-left {
+    text-align: left;
+}
+#report_table .table-header-padding {
+    padding: 10px;
+}
+
+/* Klasa dla tekstu ostrzeżenia (np. "UWAGA: 0.00%") */
+.warning-text {
+    color: #c00; /* Czerwony kolor */
+    font-weight: bold;
+}
+
+/* Klasa dla paska "Podstawa (%)" */
+.prog-prowizji {
+    font-weight: bold;
+}
+
+/* Klasa dla drugiej linii "Prowizji", gdy wartość zamówień > 5000.00 */
+.threshold-highlight {
+    color: #666; /* Szary kolor */
+}
+
+/* Klasa dla rzeczywistej stawki prowizji (kolor #2E8F84) */
+.tiered-rate-highlight {
+    color: #2E8F84; /* Zielonkawy kolor */
+    font-weight: bold;
+}
+
+/* Klasa dla tła "WYJĄTEK" w kolumnie Control */
+.exception-highlight {
+    background-color: #EBE0CB; /* Kolor tła dla wyjątków */
+}
+
+/* Nowa klasa dla kolumny "Prowizja netto" */
+.net-commission-highlight {
+    color: #3E7DC4; /* Niebieski kolor */
+    font-weight: bold;
+}
+
+/* Styl dla klikalnych sum */
+.js-orders-bl-link,
+.js-provision-sum-link {
+    cursor: pointer;
+    text-decoration: underline;
+	color:#000;
+	text-decoration-color: #2199E0;
+	text-decoration-thickness: .125em;
+	text-underline-offset: 2px;
+	/* text-decoration-skip-ink: auto;*/
+    /* Możesz dodać :hover efekt */
+}

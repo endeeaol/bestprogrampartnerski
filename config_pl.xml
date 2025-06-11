@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<module>
+    <name>bestprogrampartnerski</name>
+    <displayName><![CDATA[Kontrolka P.P.]]></displayName>
+    <version><![CDATA[1.0.0]]></version>
+    <description><![CDATA[Weryfikacja należnych wypłat prowizji z tytułu członkostwa w programie partnerskim.]]></description>
+    <author><![CDATA[BESTLAB Ernest]]></author>
+    <tab><![CDATA[administration]]></tab>
+	<confirmUninstall><![CDATA[Czy na pewno chcesz odinstalować ten moduł? Wszystkie dane zostaną usunięte.]]></confirmUninstall>
+    <is_configurable>0</is_configurable>
+    <need_instance>0</need_instance>
+</module>
