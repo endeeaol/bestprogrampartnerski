@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <module>
     <name>bestprogrampartnerski</name>
-    <displayName><![CDATA[Kontrolka P.P.]]></displayName>
-    <version><![CDATA[1.0.0]]></version>
+    <displayName><![CDATA[Raportowanie PP]]></displayName>
+    <version><![CDATA[1.4.0]]></version>
     <description><![CDATA[Weryfikacja należnych wypłat prowizji z tytułu członkostwa w programie partnerskim.]]></description>
     <author><![CDATA[BESTLAB Ernest]]></author>
     <tab><![CDATA[administration]]></tab>
